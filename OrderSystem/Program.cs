@@ -223,7 +223,7 @@ namespace OrderSystem
 
             Console.WriteLine("\n|| 1. Continue checkout");
             Console.WriteLine("|| 2. Add more");
-            Console.WriteLine("\nInput: ");
+            Console.Write("\nInput: ");
 
             //MAKE MORE RICH ... missing checkout screen, and exit
 
