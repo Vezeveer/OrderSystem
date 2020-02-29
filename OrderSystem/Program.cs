@@ -14,10 +14,11 @@ namespace OrderSystem
         static int[] itemAvailableStock = { 13, 66, 32 };
         static int[] itemMinStock = { 1, 1, 1 };
         static double totalCost = 0;
+        static bool loopProgram = true;
 
         static void Main(string[] args)
         {
-            bool loopProgram = true;
+            
             do
             {
                 int[] loopXchoice = new int[2];
@@ -29,9 +30,9 @@ namespace OrderSystem
                     Console.WriteLine("|| _______________");
                     Console.WriteLine("||");
 
-                    Console.WriteLine("|| 1. " + itemNames[0]);
-                    Console.WriteLine("|| 2. " + itemNames[1]);
-                    Console.WriteLine("|| 3. " + itemNames[2]);
+                    Console.WriteLine("|| 1. " + itemNames[0] + "(" + itemAmounts[0] + ")");
+                    Console.WriteLine("|| 2. " + itemNames[1] + "(" + itemAmounts[1] + ")");
+                    Console.WriteLine("|| 3. " + itemNames[2] + "(" + itemAmounts[2] + ")");
                     Console.WriteLine("|| 4. Cancel and Exit");
                     if (isCartEmpty() == false)
                     {
@@ -185,7 +186,7 @@ namespace OrderSystem
             {
                 inputArray[0] = 1;
             }
-            return inputArray;
+            return inputArray; //returns validity 1 for invalid, and input number
         }
 
         static void displayCart(string itemName,int item, string deletedOrAdded)
@@ -210,24 +211,59 @@ namespace OrderSystem
 
         static void checkOut()
         {
-            Console.Clear();
-            Console.WriteLine("|| YOU ELECTRONICS");
-            Console.WriteLine("|| _______________");
-            Console.WriteLine("||");
-            Console.WriteLine("|| In Cart: ");
-            for(int i = 0; i < itemAmounts.Length; i++)
+            int[] loopXinput = new int[2];
+            bool loop = false, showSuccess = false, showError = false;
+            do
             {
-                Console.WriteLine("|| " + itemNames[i] + ": " + itemAmounts[i] + " items amounting " + (itemAmounts[i]*itemPrices[i]) + " PHP");
-            }
-            Console.WriteLine("|| Total Costs: " + totalCost);
+                Console.Clear();
+                Console.WriteLine("|| YOU ELECTRONICS");
+                Console.WriteLine("|| _______________");
+                Console.WriteLine("||");
+                Console.WriteLine("|| In Cart: ");
+                for (int i = 0; i < itemAmounts.Length; i++)
+                {
+                    Console.WriteLine("|| " + itemNames[i] + ": " + itemAmounts[i] + " items amounting " + (itemAmounts[i] * itemPrices[i]) + " PHP");
+                }
+                Console.WriteLine("|| Total Costs: " + totalCost);
+                Console.WriteLine("|| ");
+                if (showSuccess)
+                {
+                    Console.WriteLine("|| Success!");
+                    Console.WriteLine("|| Thank you.");
+                    Console.WriteLine("\nPress any key to exit. ");
+                    Console.ReadLine();
+                    loopProgram = false;
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("\n|| 1. Continue checkout");
+                    Console.WriteLine("|| 2. Add more");
+                }
+                
+                if (showError == true)
+                    Console.WriteLine("\n>Invalid Input");
+                Console.Write("\nInput: ");
 
-            Console.WriteLine("\n|| 1. Continue checkout");
-            Console.WriteLine("|| 2. Add more");
-            Console.Write("\nInput: ");
-
-            //MAKE MORE RICH ... missing checkout screen, and exit
-
-            Console.ReadLine();
+                loopXinput = checkInput(1, 2);
+                if(loopXinput[0] == 1)
+                {
+                    showError = true;
+                    loop = true;
+                }
+                else
+                {
+                    switch(loopXinput[1])
+                    {
+                        case 1:
+                            showSuccess = true;
+                            break;
+                        case 2:
+                            loop = false;
+                            break;
+                    }
+                }
+            } while (loop);
         }
 
         static bool isCartEmpty()
