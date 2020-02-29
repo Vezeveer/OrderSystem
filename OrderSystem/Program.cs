@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OrderSystem
 {
@@ -10,7 +6,7 @@ namespace OrderSystem
     {
         static double[] itemPrices = { 1299.00, 1699.00, 1399.00 };
         static string[] itemNames = { "Nvidia GTX 1080 card", "8GB desktop RAM stick", "Power Supply Unit 500W" };
-        static int[] itemAmounts = { 0, 0, 0 };
+        static int[] itemsInCart = { 0, 0, 0 };
         static int[] itemAvailableStock = { 13, 66, 32 };
         static int[] itemMinStock = { 1, 1, 1 };
         static double totalCost = 0;
@@ -20,43 +16,47 @@ namespace OrderSystem
             bool loopProgram = true;
             do
             {
-                int[] loopXchoice = new int[2];
-                int max, min = 1;
-                do
+                int[] loopXchoice = new int[2]; //to store loop indicator & said choice
+                int max, min = 1, xID = 1; //delete xID soon
+                int menuChoice, itemChoice, addRemoveChoice;
+
+                string[] menuOptions = { "Browse Products", "Check Cart & Checkout", "Exit" };
+                string[] addRemoveOptions = { "Add", "Remove" };
+
+                menuChoice = choice(menuOptions, ""); //print screen & check choice
+
+                switch(menuChoice)
                 {
-                    Console.Clear();
-                    Console.WriteLine("|| YOU ELECTRONICS");
-                    Console.WriteLine("|| _______________");
-                    Console.WriteLine("||");
+                    case 1: //Browse
 
-                    Console.WriteLine("|| 1. " + itemNames[0]);
-                    Console.WriteLine("|| 2. " + itemNames[1]);
-                    Console.WriteLine("|| 3. " + itemNames[2]);
-                    Console.WriteLine("|| 4. Cancel and Exit");
-                    if (isCartEmpty() == false)
-                    {
-                        Console.WriteLine("|| 5. Checkout");
-                        max = 5;
-                    }
-                    else
-                        max = 4;
-                    if (loopXchoice[0] == 1)
-                        Console.WriteLine("\n>Invalid Input.");
-                    Console.Write("\nInput: ");
+                        itemChoice = choice(itemNames, "Go Back");
+                        addRemoveChoice = choice(addRemoveOptions, "Go Back");
+                        switch (addRemoveChoice)
+                        {
+                            case 1:
+                                addOrRemoveFromCart(itemChoice, "add");
+                                break;
+                            case 2:
+                                addOrRemoveFromCart(itemChoice, "remove");
+                                break;
+                            case 3:
 
-                    loopXchoice = checkInput(min, max); //1 min, 5 max
+                                break;
+                        }
+                        break;
+                    case 2:
 
-                    Console.Clear();
-                    
-                } while (loopXchoice[0] == 1);
+                        // items display
+                        choice(new string[] { "Checkout", "Go Back" }, "");
 
-                int xID = loopXchoice[1] - 1;
+                        break;
+                }
 
                 //Proceed to ADD or REMOVE selected item, Checkout, or exit
                 if (xID >= 0 && xID <= 2)
                 {
                     //Add or Delete, and check if cart & available stock is not empty
-                    if(itemAmounts[xID] != 0)
+                    if(itemsInCart[xID] != 0)
                     {
                         int loopCart = 0;
                         int choiceAR;
@@ -81,7 +81,7 @@ namespace OrderSystem
                             if (itemAvailableStock[xID] != 0)
                             {
                                 addDeleteCart(xID, itemMinStock[xID], itemAvailableStock[xID], "add");
-                                displayCart(itemNames[xID], itemAmounts[xID], "added");
+                                displayCart(itemNames[xID], itemsInCart[xID], "added");
                             }
                             else
                             {
@@ -97,14 +97,14 @@ namespace OrderSystem
                         }
                         else //DELETE
                         {
-                            addDeleteCart(xID, itemMinStock[xID], itemAmounts[xID], "delete");
-                            displayCart(itemNames[xID], itemAmounts[xID], "deleted");
+                            addDeleteCart(xID, itemMinStock[xID], itemsInCart[xID], "delete");
+                            displayCart(itemNames[xID], itemsInCart[xID], "deleted");
                         }
                     }
                     else //ADD
                     {
                         addDeleteCart(xID, itemMinStock[xID], itemAvailableStock[xID], "add");
-                        displayCart(itemNames[xID], itemAmounts[xID], "added");
+                        displayCart(itemNames[xID], itemsInCart[xID], "added");
                     }
                 }
                 else if (xID == 4) //Checkout
@@ -129,7 +129,7 @@ namespace OrderSystem
                 if(addOrRemove == "add")
                     Console.WriteLine("\n|| Available stock: " + itemAvailableStock[itemID]);
                 else
-                    Console.WriteLine("\n|| Total of this type in cart: " + itemAmounts[itemID]);
+                    Console.WriteLine("\n|| Total of this type in cart: " + itemsInCart[itemID]);
 
                 if (loopXamount[0] == 1)
                     Console.WriteLine("\n>Invalid Input.");
@@ -141,11 +141,11 @@ namespace OrderSystem
                     switch(addOrRemove)
                     {
                         case "add":
-                            itemAmounts[itemID] += loopXamount[1];
+                            itemsInCart[itemID] += loopXamount[1];
                             itemAvailableStock[itemID] -= loopXamount[1];
                             break;
                         case "delete":
-                            itemAmounts[itemID] -= loopXamount[1];
+                            itemsInCart[itemID] -= loopXamount[1];
                             itemAvailableStock[itemID] += loopXamount[1];
 
                             break;
@@ -162,9 +162,9 @@ namespace OrderSystem
         static void calculateTotalCost()
         {
             double tempAmount = 0;
-            for (int i = 0; i < itemAmounts.Length; i++)
+            for (int i = 0; i < itemsInCart.Length; i++)
             {
-                tempAmount += itemAmounts[i] * itemPrices[i];
+                tempAmount += itemsInCart[i] * itemPrices[i];
             }
             totalCost = tempAmount;
         }
@@ -215,9 +215,9 @@ namespace OrderSystem
             Console.WriteLine("|| _______________");
             Console.WriteLine("||");
             Console.WriteLine("|| In Cart: ");
-            for(int i = 0; i < itemAmounts.Length; i++)
+            for(int i = 0; i < itemsInCart.Length; i++)
             {
-                Console.WriteLine("|| " + itemNames[i] + ": " + itemAmounts[i] + " items amounting " + (itemAmounts[i]*itemPrices[i]) + " PHP");
+                Console.WriteLine("|| " + itemNames[i] + ": " + itemsInCart[i] + " items amounting " + (itemsInCart[i]*itemPrices[i]) + " PHP");
             }
             Console.WriteLine("|| Total Costs: " + totalCost);
 
@@ -225,15 +225,103 @@ namespace OrderSystem
             Console.WriteLine("|| 2. Add more");
             Console.Write("\nInput: ");
 
+
+
             //MAKE MORE RICH ... missing checkout screen, and exit
 
             Console.ReadLine();
         }
 
+        static void renderScreen(string [] optionsArray, string lastOptions)
+        {
+            int i = 0;
+            Console.Clear();
+            Console.WriteLine("|| PC PARTS");
+            Console.WriteLine("|| _______________\n||");
+            for(; i < optionsArray.Length; i++)
+                Console.WriteLine("|| " + (i+1) + ". " + optionsArray[i]);
+            Console.WriteLine("|| " +  lastOptions);
+            Console.WriteLine("||\n");
+        }
+
+        static void addOrRemoveFromCart(int itemElement,string addRemove)
+        {
+            if (itemAvailableStock[itemElement] == 0) //check stock availability
+            {
+                renderScreen(new string[] { }, "We are out of stock!");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadLine();
+            }
+            else
+            {
+                bool loop = false;
+                int amount = 0;
+                do //check amount validity
+                {
+                    renderScreen(new string[] { }, "Enter amount to " + addRemove);
+                    if (loop)
+                        Console.WriteLine("Invalid Input\n");
+                    try
+                    {
+                        amount = int.Parse(Console.ReadLine());
+                    }
+                    catch
+                    {
+                        loop = true;
+                    }
+                    if (amount > itemAvailableStock[itemElement] || amount == 0)
+                    {
+                        Console.WriteLine("Invalid Input\n");
+                        loop = true;
+                    }
+                    else //if amount checks out, do add or remove & exit loop
+                    {
+                        if (addRemove == "add")
+                        {
+                            itemsInCart[itemElement] += amount;
+                            itemAvailableStock[itemElement] -= amount;
+                            loop = false;
+                        }
+                        else if (addRemove == "remove")
+                        {
+                            itemsInCart[itemElement] -= amount;
+                            itemAvailableStock[itemElement] += amount;
+                            loop = false;
+                        }
+                    }
+                } while (loop);
+            }
+        }
+
+        //returns choice if valid & in range - takes in array of options
+        static int choice(string [] optionsArray, string lastOptions) 
+        {
+            bool error = false;
+            int choice;
+            do
+            {
+                try
+                {
+                    renderScreen(optionsArray, lastOptions);
+                    if(error)
+                        Console.WriteLine("Invalid Input");
+                    choice = int.Parse(Console.ReadLine());
+                }
+                catch
+                {
+                    choice = 0;
+                }
+                if (choice > 0 && choice <= optionsArray.Length)
+                    return choice;
+                else
+                    error = true;
+            } while (true);
+        }
+
         static bool isCartEmpty()
         {
             for (int i = 0; i < itemNames.Length; i++)
-                if (itemAmounts[i] >= 1)
+                if (itemsInCart[i] >= 1)
                     return false;
             return true;
         }
